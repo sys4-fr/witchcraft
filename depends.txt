@@ -6,6 +6,9 @@ playereffects
 player_monoids?
 farming?
 lightning?
+mobs?
+mobs_animal?
+mobs_monster?
 pmobs?
 hud_hunger?
 moreplants?

@@ -588,7 +588,7 @@ witchcraft.pot_new = {
 	{"aqua", "", "", "", "", "", ""},
 	{"brown", "redbrown", "flowers:mushroom_red", "", "", "red", "redbrown"},
 	{"redbrown", "gred", "default:apple", "", "", "", ""},
-	{"gred", "red", "witchcraft:herbs", "", "", "blue2", "magenta"},
+	{"gred", "red", "witchcraft:herb", "", "", "blue2", "magenta"},
 	{"red", "magenta", "witchcraft:tooth", "", "", "blue", "purple"},
 	{"magenta", "gpurple", "witchcraft:bottle_slime", "", "", "cyan", "darkpurple"},
 	{"gpurple", "purple", "witchcraft:bone_bottle", "", "", "yllwgrn", "green2"},
@@ -916,44 +916,45 @@ minetest.register_entity("witchcraft:tnt_splash", {
 	collisionbox = {0, 0, 0, 0, 0, 0},
 	on_step = function(self, obj, pos)		
 		local remove = minetest.after(2, function() 
-		self.object:remove()
-		end)
+													self.object:remove()
+													end)
 		local pos = self.object:getpos()
 		local objs = minetest.get_objects_inside_radius({x=pos.x,y=pos.y,z=pos.z}, 2)	
-			for k, obj in pairs(objs) do
-				if obj:get_luaentity() ~= nil then
-					if obj:get_luaentity().name ~= "witchcraft:tnt_splash" and obj:get_luaentity().name ~= "__builtin:item" then
-						obj:punch(self.object, 1.0, {
-							full_punch_interval=1.0,
-							damage_groups={fleshy=3},
-						}, nil)
+		for k, obj in pairs(objs) do
+			if obj:get_luaentity() ~= nil then
+				if obj:get_luaentity().name ~= "witchcraft:tnt_splash" and obj:get_luaentity().name ~= "__builtin:item" then
+					obj:punch(self.object, 1.0, {
+									 full_punch_interval=1.0,
+									 damage_groups={fleshy=3},
+														 }, nil)
 					tnt.boom(pos, {damage_radius=5,radius=3,ignore_protection=false})
 					self.object:remove()
+				end
+			end
+		end
+		for dx=0,1 do
+			for dy=0,1 do
+				for dz=0,1 do
+					local p = {x=pos.x+dx, y=pos.y, z=pos.z+dz}
+					local t = {x=pos.x+dx, y=pos.y+dy, z=pos.z+dz}
+					local n = minetest.env:get_node(p).name
+					if n ~= "witchcraft:tnt_splash" and n ~="default:obsidian" and n ~= "air" then	
+						local pos = self.object:getpos()
+						minetest.sound_play("default_break_glass.1", {
+													  pos = self.object:getpos(),
+													  gaint = 1.0,
+													  max_hear_distance = 20,
+																					})
+						tnt.boom(pos, {damage_radius=5,radius=3,ignore_protection=false})
+						self.object:remove()
+						return
 					end
 				end
 			end
-			for dx=0,1 do
-						for dy=0,1 do
-							for dz=0,1 do
-								local p = {x=pos.x+dx, y=pos.y, z=pos.z+dz}
-								local t = {x=pos.x+dx, y=pos.y+dy, z=pos.z+dz}
-								local n = minetest.env:get_node(p).name
-								if n ~= "witchcraft:tnt_splash" and n ~="default:obsidian" and n ~= "air" then	
-									local pos = self.object:getpos()
-									minetest.sound_play("default_break_glass.1", {
-									pos = self.object:getpos(),
-									gaint = 1.0,
-									max_hear_distance = 20,
-									})
-									tnt.boom(pos, {damage_radius=5,radius=3,ignore_protection=false})
-										self.object:remove()
-									return
-								end
-							end
-						end
-					end
-			hit_node = function(self, pos, node)
-    local pos = self.object:getpos()
+		end
+	end,
+	hit_node = function(self, pos, node)
+		local pos = self.object:getpos()
 		for dx=-4,4 do
 			for dy=-4,4 do
 				for dz=-4,4 do
@@ -964,20 +965,16 @@ minetest.register_entity("witchcraft:tnt_splash", {
 						tnt.boom(n, {damage_radius=5,radius=3,ignore_protection=false})
 					end
 					if minetest.registered_nodes[n].groups.flammable or math.random(1, 100) <=5 then
-								if not ignore_protection and minetest.is_protected(npos, "") then
-								return
-								end
-										minetest.env:set_node(t, {name="fire:basic_flame"})
+						if not ignore_protection and minetest.is_protected(pos, "") then
+							return
+						end
+						minetest.env:set_node(t, {name="fire:basic_flame"})
 					end
 				end
 			end
 		end
-		end
-		
-	end,
+	end
 })
-
-
 
 minetest.register_entity("witchcraft:fire_splash", {
 	textures = {"witchcraft_splash_orange.png"},
@@ -986,47 +983,48 @@ minetest.register_entity("witchcraft:fire_splash", {
 	collisionbox = {0, 0, 0, 0, 0, 0},
 	on_step = function(self, obj, pos)		
 		local remove = minetest.after(2, function() 
-		self.object:remove()
-		end)
+													self.object:remove()
+													end)
 		local pos = self.object:getpos()
 		local objs = minetest.get_objects_inside_radius({x=pos.x,y=pos.y,z=pos.z}, 2)	
-			for k, obj in pairs(objs) do
-				if obj:get_luaentity() ~= nil then
-					if obj:get_luaentity().name ~= "witchcraft:fire_splash" and obj:get_luaentity().name ~= "__builtin:item" then
-						obj:punch(self.object, 1.0, {
-							full_punch_interval=1.0,
-							damage_groups={fleshy=1},
-						}, nil)
+		for k, obj in pairs(objs) do
+			if obj:get_luaentity() ~= nil then
+				if obj:get_luaentity().name ~= "witchcraft:fire_splash" and obj:get_luaentity().name ~= "__builtin:item" then
+					obj:punch(self.object, 1.0, {
+									 full_punch_interval=1.0,
+									 damage_groups={fleshy=1},
+														 }, nil)
 					self.object:remove()
+				end
+			end
+		end
+		for dx=0,1 do
+			for dy=0,1 do
+				for dz=0,1 do
+					local p = {x=pos.x+dx, y=pos.y, z=pos.z+dz}
+					local t = {x=pos.x+dx, y=pos.y+dy, z=pos.z+dz}
+					local n = minetest.env:get_node(p).name
+					if n ~= "witchcraft:fire_splash" and n ~= "air" then
+						if not ignore_protection and minetest.is_protected(pos, "") then
+							return
+						end
+						minetest.env:set_node(t, {name="fire:basic_flame"})
+						minetest.sound_play("default_break_glass.1", {
+													  pos = pos,
+													  max_hear_distance = 20,
+													  gain = 10.0,
+																					})
+						self.object:remove()
+					elseif n =="default:dirt_with_grass" or n =="default:dirt_with_dry_grass" then
+						self.object:remove()
+						return
 					end
 				end
 			end
-			for dx=0,1 do
-						for dy=0,1 do
-							for dz=0,1 do
-								local p = {x=pos.x+dx, y=pos.y, z=pos.z+dz}
-								local t = {x=pos.x+dx, y=pos.y+dy, z=pos.z+dz}
-								local n = minetest.env:get_node(p).name
-								if n ~= "witchcraft:fire_splash" and n ~= "air" then
-								if not ignore_protection and minetest.is_protected(npos, "") then
-								return
-								end
-										minetest.env:set_node(t, {name="fire:basic_flame"})
-									minetest.sound_play("default_break_glass.1", {
-									pos = self.object:getpos(),
-									max_hear_distance = 20,
-									gain = 10.0,
-									})
-										self.object:remove()
-								elseif n =="default:dirt_with_grass" or n =="default:dirt_with_dry_grass" then
-									self.object:remove()
-									return
-								end
-							end
-						end
-					end
-			hit_node = function(self, pos, node)
-    local pos = self.object:getpos()
+		end
+	end,
+	hit_node = function(self, pos, node)
+		local pos = self.object:getpos()
 		for dx=-4,4 do
 			for dy=-4,4 do
 				for dz=-4,4 do
@@ -1037,14 +1035,12 @@ minetest.register_entity("witchcraft:fire_splash", {
 						minetest.env:remove_node(p)
 					end
 					if minetest.registered_nodes[n].groups.flammable or math.random(1, 100) <=5 then
-										minetest.env:set_node(t, {name="fire:basic_flame"})
+						minetest.env:set_node(t, {name="fire:basic_flame"})
 					end
 				end
 			end
 		end
-		end
-		
-	end,
+	end
 })
 
 minetest.register_entity("witchcraft:death_splash", {
@@ -2798,7 +2794,7 @@ minetest.register_node("witchcraft:potion_silver_2", {
 	end
 })
 
-if minetest.get_modpath("farming_redo") then
+if farming.mod and farming.mod == "redo" then
 minetest.register_node("witchcraft:potion_green", {
 	description = "Melon Potion",
 	drawtype = "plantlike",
